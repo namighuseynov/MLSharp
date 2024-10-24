@@ -1,0 +1,125 @@
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# VS Code directories
+.vscode/
+.vscode/settings.json
+
+# Local history for Visual Studio
+.vs/
+
+# Rider project files
+.idea/
+
+# Auto-generated files by Visual Studio
+*.csproj.user
+*.sln.docstates
+*.dotSettings.user
+
+# Backup & hidden folders
+*_Backup/
+_backup/
+~$*
+
+# Packages
+*.nupkg
+*.snupkg
+
+# Visual Studio installer cache
+.vs_installer/
+
+# NuGet
+*.nupkg
+**/packages/*
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Logs
+*.log
+
+# Rider specific
+.idea/
+
+# Uncomment if you have a global gitignore that includes these kinds of paths
+#!.vscode/
+#!.idea/
+
+# Visual Studio solution file
+*.sln
+*.vcxproj.user
+*.vcxproj.filters
+*.dbmdl
+*.pdb
+
+# Build outputs
+*.dll
+*.exe
+*.app
+*.ipa
+*.iobj
+*.ipdb
+*.log
+*.bin
+*.bsc
+*.lib
+*.map
+*.so
+*.def
+*.rsp
+*.exp
+*.idb
+*.tmp
+*.tmp_proj
+*.obj
+*.cache
+
+# JetBrains Rider files
+.idea/
+*.dotSettings.user
+
+# Resharper settings
+_ReSharper*/
+
+# Enable if you're using Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+Assets/AssetStoreTools*
+
+# Uncomment if needed for Unity projects
+# [Pp]ackages/
+# ProjectSettings/
+
