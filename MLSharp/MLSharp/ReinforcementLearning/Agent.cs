@@ -1,4 +1,6 @@
-﻿namespace MLSharp.ReinforcementLearning
+﻿using System.Text.Json;
+
+namespace MLSharp.ReinforcementLearning
 {
     /// <summary>
     /// 
@@ -6,31 +8,59 @@
     public abstract class Agent
     {
         #region Constructors
-        public Agent(List<Action> actions, List<Perceptor> perceptors)
+        public Agent(List<Action> actions, List<Perceptor> perceptors, Configuration config)
         {
-            _qTable = new Dictionary<(string, int), double>();
+            _random = new Random();
             _actions = actions;
             _perceptors = perceptors;
-            //_configuration = LoadConfiguration();
+            _configuration = config;
+
+            if (File.Exists(config.BrainPath))
+            {
+                LoadQTable(config.BrainPath);
+            }
+            else
+            {
+                _qTable = new Dictionary<(string, int), double>();
+            }
             ActionReceived += OnActionReceived;
+            _takedAction = 0;
+            _prevState = string.Empty;
         }
         #endregion
 
         #region Fields
         private Dictionary<(string, int), double> _qTable;
+        private Random _random;
         private List<Action> _actions;
         private List<Perceptor> _perceptors;
         private event Action ActionReceived;
         private Configuration _configuration;
+        private bool _learns = false;
+        private int _takedAction;
+        private string _prevState;
         #endregion
 
         #region Methods
-        public void TakeAction()
+        private void TakeAction()
         {
+            _prevState = GetState();
+            if (_learns && (_random.NextDouble() < _configuration.ExplorationRate))
+            {
+                int randomAction = _random.Next(_actions.Count);
+                _takedAction = randomAction;
+            }
+            else
+            {
+                string state = GetState();
+                int bestAction = GetBestAction(state);
+                _takedAction = bestAction;
+            }
+            _actions[_takedAction].Invoke();
             ActionReceived?.Invoke();
         }
 
-        public string GetState()
+        private string GetState()
         {
             string currentState = string.Empty;
             foreach (var perceptor in _perceptors)
@@ -45,14 +75,75 @@
             TakeAction();
         }
 
-        //private Configuration LoadConfiguration(string path)
-        //{
-        //    return new Configuration();
-        //}
+        private double GetQValue(string state, int action)
+        {
+            if (_qTable.ContainsKey((state, action)))
+            {
+                return _qTable[(state, action)];
+            }
+            return 0.0;
+        }
+
+        private void SetQValue(string state, int action, double qValue)
+        {
+            _qTable[(state, action)] = qValue;
+        }
+
+        private int GetBestAction(string state)
+        {
+            int bestAction = 0;
+            double bestQValue = GetQValue(state, bestAction);
+
+            for (int i = 0; i < _actions.Count; i++)
+            {
+                double currentQValue = GetQValue(state, i);
+                if (bestAction < currentQValue)
+                {
+                    bestQValue = currentQValue;
+                    bestAction = i;
+                }
+            }
+            return bestAction;
+        }
+
+        private void UpdateQValues(double reward)
+        {
+            string state = _prevState;
+            int action = _takedAction;
+            string nextState = GetState();
+            int nextAction = GetBestAction(nextState); ;
+
+            double qValue = GetQValue(state, action);
+            double nextQValue = GetQValue(nextState, nextAction);
+            double newQValue = qValue + _configuration.LearningRate * (reward + _configuration.DiscountFactor * nextQValue - qValue);
+            SetQValue(state, action, newQValue);
+        }
+
+        protected void SetReward(double reward)
+        {
+            UpdateQValues(reward);
+        }
+
+        private void LoadQTable(string filePath)
+        {
+            string json = File.ReadAllText(filePath);
+            _qTable = JsonSerializer.Deserialize<Dictionary<(string, int), double>>(json) ?? new Dictionary<(string, int), double>();
+        }
+
+        private void SaveQTable(string filePath)
+        {
+            string json = JsonSerializer.Serialize(_qTable);
+            File.WriteAllText(filePath, json);
+        }
+
         #endregion
 
         #region Events
         public abstract void OnActionReceived();
+        #endregion
+
+        #region Properties
+        public bool Learns { get { return _learns; } set { _learns = value; } }
         #endregion
     }
 }
