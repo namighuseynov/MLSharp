@@ -5,10 +5,10 @@ namespace MLSharp.ReinforcementLearning
     /// <summary>
     /// 
     /// </summary>
-    public abstract class Agent
+    public abstract class QAgent
     {
         #region Constructors
-        public Agent(List<Action> actions, List<Perceptor> perceptors, Configuration config)
+        public QAgent(List<Action> actions, List<Perceptor> perceptors, Configuration config)
         {
             _random = new Random();
             _actions = actions;
