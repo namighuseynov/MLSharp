@@ -200,6 +200,57 @@
         {
             return new Matrix(new double[rows, columns]);
         }
+        /// <summary>
+        /// Sum of the matrix elements
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static double Sum(Matrix data)
+        {
+            double sum = 0;
+            for (int i = 0; i < data.Rows; i++)
+                for (int j = 0; j < data.Columns; j++)
+                    sum += data[i, j];
+            return sum;
+        }
+        public static Matrix Multiply(Matrix mat1,  Matrix mat2)
+        {
+            if (mat1.Columns != mat2.Rows)
+            {
+                throw new ArgumentException("Invalid dimensions for matrix multiplication.");
+            }
+
+            double[,] result = new double[mat1.Rows, mat2.Columns];
+
+            for (int i = 0; i < mat1.Rows; i++)
+                for (int j = 0; j < mat2.Columns; j++)
+                    for (int k = 0; k < mat1.Columns; k++)
+                        result[i, j] += mat1[i, k] * mat2[k, j];
+
+            return new Matrix(result);
+        }
+        /// <summary>
+        /// Returns a new matrix where each element is squared.
+        /// </summary>
+        /// <param name="matrix">The input matrix.</param>
+        /// <returns>A new matrix with squared elements.</returns>
+        public static Matrix SquareElements(Matrix matrix)
+        {
+            if (matrix == null)
+                throw new ArgumentNullException(nameof(matrix), "Input matrix cannot be null.");
+
+            double[,] result = new double[matrix.Rows, matrix.Columns];
+
+            for (int i = 0; i < matrix.Rows; i++)
+            {
+                for (int j = 0; j < matrix.Columns; j++)
+                {
+                    result[i, j] = matrix[i, j] * matrix[i, j];
+                }
+            }
+
+            return new Matrix(result);
+        }
         #endregion
 
         #region Properties
@@ -228,6 +279,55 @@
         {
             get => _matrix[row, col];
             set => _matrix[row, col] = value;
+        }
+        /// <summary>
+        /// Addition operator for matrices.
+        /// </summary>
+        /// <param name="a">First matrix.</param>
+        /// <param name="b">Second matrix.</param>
+        /// <returns>New matrix representing the sum of two matrices.</returns>
+        /// <exception cref="ArgumentException">Thrown when matrix dimensions do not match.</exception>
+        public static Matrix operator +(Matrix a, Matrix b)
+        {
+            if (a.Rows != b.Rows || a.Columns != b.Columns)
+                throw new ArgumentException("Matrix dimensions must match for addition.");
+
+            double[,] result = new double[a.Rows, a.Columns];
+
+            for (int i = 0; i < a.Rows; i++)
+            {
+                for (int j = 0; j < a.Columns; j++)
+                {
+                    result[i, j] = a[i, j] + b[i, j];
+                }
+            }
+
+            return new Matrix(result);
+        }
+
+        /// <summary>
+        /// Subtraction operator for matrices.
+        /// </summary>
+        /// <param name="a">First matrix.</param>
+        /// <param name="b">Second matrix.</param>
+        /// <returns>New matrix representing the difference of two matrices.</returns>
+        /// <exception cref="ArgumentException">Thrown when matrix dimensions do not match.</exception>
+        public static Matrix operator -(Matrix a, Matrix b)
+        {
+            if (a.Rows != b.Rows || a.Columns != b.Columns)
+                throw new ArgumentException("Matrix dimensions must match for subtraction.");
+
+            double[,] result = new double[a.Rows, a.Columns];
+
+            for (int i = 0; i < a.Rows; i++)
+            {
+                for (int j = 0; j < a.Columns; j++)
+                {
+                    result[i, j] = a[i, j] - b[i, j];
+                }
+            }
+
+            return new Matrix(result);
         }
         #endregion
     }
