@@ -15,9 +15,9 @@ namespace MLSharp.ReinforcementLearning
             _perceptors = perceptors;
             _configuration = config;
 
-            if (File.Exists(config.BrainPath))
+            if (File.Exists(config.BrainPath) && _continueLearning)
             {
-                LoadQTable(config.BrainPath);
+                Load(config.BrainPath);
             }
             else
             {
@@ -37,6 +37,7 @@ namespace MLSharp.ReinforcementLearning
         private event Action ActionReceived;
         private Configuration _configuration;
         private bool _learns = false;
+        private bool _continueLearning = false;
         private int _takedAction;
         private string _prevState;
         #endregion
@@ -60,7 +61,7 @@ namespace MLSharp.ReinforcementLearning
             ActionReceived?.Invoke();
         }
 
-        private string GetState()
+        protected string GetState()
         {
             string currentState = string.Empty;
             foreach (var perceptor in _perceptors)
@@ -70,7 +71,7 @@ namespace MLSharp.ReinforcementLearning
             return currentState;
         }
 
-        public void Start()
+        public void Handle()
         {
             TakeAction();
         }
@@ -124,15 +125,22 @@ namespace MLSharp.ReinforcementLearning
             UpdateQValues(reward);
         }
 
-        private void LoadQTable(string filePath)
+        public void Load(string filePath)
         {
             string json = File.ReadAllText(filePath);
-            _qTable = JsonSerializer.Deserialize<Dictionary<(string, int), double>>(json) ?? new Dictionary<(string, int), double>();
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new DictionaryValueTupleConverter<double>());
+
+            _qTable = JsonSerializer.Deserialize<Dictionary<(string, int), double>>(json, options)
+                      ?? new Dictionary<(string, int), double>();
         }
 
-        private void SaveQTable(string filePath)
+        public void Save(string filePath)
         {
-            string json = JsonSerializer.Serialize(_qTable);
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new DictionaryValueTupleConverter<double>());
+
+            string json = JsonSerializer.Serialize(_qTable, options);
             File.WriteAllText(filePath, json);
         }
 
@@ -144,6 +152,7 @@ namespace MLSharp.ReinforcementLearning
 
         #region Properties
         public bool Learns { get { return _learns; } set { _learns = value; } }
+        public bool ContinueLearning { get { return _continueLearning; } set { _continueLearning = value; } }
         #endregion
     }
 }
