@@ -8,12 +8,13 @@ namespace MLSharp.ReinforcementLearning
     public abstract class QAgent
     {
         #region Constructors
-        public QAgent(List<Action> actions, List<Perceptor> perceptors, Configuration config)
+        public QAgent(List<Action> actions, List<Perceptor> perceptors, Configuration config, bool learns)
         {
             _random = new Random();
             _actions = actions;
             _perceptors = perceptors;
             _configuration = config;
+            _learns = learns;
 
             if (File.Exists(config.BrainPath) && _continueLearning)
             {
@@ -95,10 +96,10 @@ namespace MLSharp.ReinforcementLearning
             int bestAction = 0;
             double bestQValue = GetQValue(state, bestAction);
 
-            for (int i = 0; i < _actions.Count; i++)
+            for (int i = 1; i < _actions.Count; i++)
             {
                 double currentQValue = GetQValue(state, i);
-                if (bestAction < currentQValue)
+                if (bestQValue < currentQValue)
                 {
                     bestQValue = currentQValue;
                     bestAction = i;
