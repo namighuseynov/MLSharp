@@ -62,7 +62,7 @@ namespace MLSharp.ReinforcementLearning
             ActionReceived?.Invoke();
         }
 
-        protected virtual string GetState()
+        public virtual string GetState()
         {
             string currentState = string.Empty;
             foreach (var perceptor in _perceptors)
