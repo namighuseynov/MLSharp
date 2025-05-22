@@ -8,13 +8,14 @@ namespace MLSharp.ReinforcementLearning
     public abstract class QAgent
     {
         #region Constructors
-        public QAgent(List<Action> actions, List<Perceptor> perceptors, Configuration config, bool learns)
+        public QAgent(List<Action> actions, List<Perceptor> perceptors, Configuration config, bool learns, bool continueLearningProcess)
         {
             _random = new Random();
             _actions = actions;
             _perceptors = perceptors;
             _configuration = config;
             _learns = learns;
+            _continueLearning = continueLearningProcess;
 
             if (File.Exists(config.BrainPath) && _continueLearning)
             {
