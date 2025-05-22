@@ -3,21 +3,19 @@
 namespace MLSharp.ReinforcementLearning
 {
     /// <summary>
-    /// 
+    /// Agent (Q Learning)
     /// </summary>
     public abstract class QAgent
     {
         #region Constructors
-        public QAgent(List<Action> actions, List<Perceptor> perceptors, Configuration config, bool learns, bool continueLearningProcess)
+        public QAgent(List<Action> actions, Configuration config, bool learns)
         {
             _random = new Random();
             _actions = actions;
-            _perceptors = perceptors;
             _configuration = config;
             _learns = learns;
-            _continueLearning = continueLearningProcess;
 
-            if (File.Exists(config.BrainPath) && _continueLearning)
+            if (File.Exists(config.BrainPath))
             {
                 Load(config.BrainPath);
             }
@@ -35,11 +33,9 @@ namespace MLSharp.ReinforcementLearning
         private Dictionary<(string, int), double> _qTable;
         private Random _random;
         private List<Action> _actions;
-        private List<Perceptor> _perceptors;
         private event Action ActionReceived;
         private Configuration _configuration;
         private bool _learns = false;
-        private bool _continueLearning = false;
         private int _takedAction;
         private string _prevState;
         #endregion
@@ -47,6 +43,8 @@ namespace MLSharp.ReinforcementLearning
         #region Methods
         private void TakeAction()
         {
+            _prevState = GetState();
+
             if (_learns && (_random.NextDouble() < _configuration.ExplorationRate))
             {
                 int randomAction = _random.Next(_actions.Count);
@@ -62,15 +60,7 @@ namespace MLSharp.ReinforcementLearning
             ActionReceived?.Invoke();
         }
 
-        public virtual string GetState()
-        {
-            string currentState = string.Empty;
-            foreach (var perceptor in _perceptors)
-            {
-                currentState += perceptor.GetState();
-            }
-            return currentState;
-        }
+        public abstract string GetState();
 
         public void Handle()
         {
@@ -105,6 +95,7 @@ namespace MLSharp.ReinforcementLearning
                     bestAction = i;
                 }
             }
+
             return bestAction;
         }
 
@@ -159,7 +150,6 @@ namespace MLSharp.ReinforcementLearning
 
         #region Properties
         public bool Learns { get { return _learns; } set { _learns = value; } }
-        public bool ContinueLearning { get { return _continueLearning; } set { _continueLearning = value; } }
         public Configuration Configuration { get { return _configuration; } }
         #endregion
     }
