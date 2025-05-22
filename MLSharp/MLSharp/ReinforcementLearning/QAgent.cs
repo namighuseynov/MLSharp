@@ -47,7 +47,6 @@ namespace MLSharp.ReinforcementLearning
         #region Methods
         private void TakeAction()
         {
-            _prevState = GetState();
             if (_learns && (_random.NextDouble() < _configuration.ExplorationRate))
             {
                 int randomAction = _random.Next(_actions.Count);
@@ -127,6 +126,12 @@ namespace MLSharp.ReinforcementLearning
             UpdateQValues(reward);
         }
 
+        public virtual void EndEpisode()
+        {
+            if (_configuration.ExplorationRate > _configuration.MinEpsilon)
+                _configuration.ExplorationRate *= _configuration.EpsilonDecay;
+        }
+
         public void Load(string filePath)
         {
             string json = File.ReadAllText(filePath);
@@ -155,6 +160,7 @@ namespace MLSharp.ReinforcementLearning
         #region Properties
         public bool Learns { get { return _learns; } set { _learns = value; } }
         public bool ContinueLearning { get { return _continueLearning; } set { _continueLearning = value; } }
+        public Configuration Configuration { get { return _configuration; } }
         #endregion
     }
 }
